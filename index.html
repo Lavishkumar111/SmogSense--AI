@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Driven Pollution Dashboard - Delhi-NCR</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-brand">
+                    <i class="fas fa-leaf"></i>
+                    <span>Delhi Air Quality Dashboard</span>
+                </div>
+                <div class="navbar-menu">
+                    <button class="nav-btn" onclick="showSection('home')" data-section="home">Home</button>
+                    <button class="nav-btn" onclick="showSection('dashboard')" data-section="dashboard">Dashboard</button>
+                    <button class="nav-btn" onclick="showSection('forecast')" data-section="forecast">Forecast</button>
+                    <button class="nav-btn" onclick="showSection('policy')" data-section="policy">Policy</button>
+                    <button class="nav-btn" onclick="showSection('citizen')" data-section="citizen">Citizen</button>
+                    <button class="nav-btn" onclick="showSection('admin')" data-section="admin">Admin</button>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-background">
+                <div class="pollution-overlay"></div>
+            </div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">AI-Driven Pollution Monitoring</h1>
+                    <h2 class="hero-subtitle">Delhi-NCR Air Quality Dashboard</h2>
+                    <p class="hero-description">
+                        Real-time monitoring, AI-powered forecasting, and policy simulation tools 
+                        for combating air pollution in Delhi National Capital Region.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="avg-aqi">245</div>
+                            <div class="stat-label">Current AQI</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Monitoring Stations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Real-time Data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <div class="container">
+                <h2 class="section-title">Core Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card" onclick="showSection('dashboard')">
+                        <div class="feature-icon red">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3>Real-time AQI Monitoring</h3>
+                        <p>Live air quality data from 12 monitoring stations across Delhi-NCR with interactive maps and detailed pollutant analysis.</p>
+                        <button class="btn btn--primary">View Dashboard</button>
+                    </div>
+                    <div class="feature-card" onclick="showSection('forecast')">
+                        <div class="feature-icon green">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>AI-Driven Forecasts</h3>
+                        <p>Advanced machine learning models (ARIMA, LSTM, CNN-LSTM) providing 7-14 day pollution forecasts with scenario analysis.</p>
+                        <button class="btn btn--primary">Run Forecast</button>
+                    </div>
+                    <div class="feature-card" onclick="showSection('policy')">
+                        <div class="feature-icon blue">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Policy Impact Analysis</h3>
+                        <p>Interactive policy simulator to test environmental measures like odd-even schemes, industrial curfews, and construction bans.</p>
+                        <button class="btn btn--primary">Policy Simulator</button>
+                    </div>
+                    <div class="feature-card" onclick="showSection('citizen')">
+                        <div class="feature-icon yellow">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Citizen Reporting Portal</h3>
+                        <p>Community-powered pollution reporting system with geo-tagging, health advisories, and real-time alert notifications.</p>
+                        <button class="btn btn--primary">Citizen Portal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+        <div class="container">
+            <h2 class="section-title">Real-time Air Quality Dashboard</h2>
+            
+            <!-- Current AQI Overview -->
+            <div class="dashboard-overview">
+                <div class="aqi-display">
+                    <div class="aqi-main">
+                        <div class="aqi-number" id="main-aqi">245</div>
+                        <div class="aqi-status" id="main-status">Poor</div>
+                        <div class="aqi-location">Delhi-NCR Average</div>
+                    </div>
+                    <div class="aqi-details">
+                        <div class="pollutant">
+                            <span>PM2.5</span>
+                            <strong id="pm25-value">108 µg/m³</strong>
+                        </div>
+                        <div class="pollutant">
+                            <span>PM10</span>
+                            <strong id="pm10-value">172 µg/m³</strong>
+                        </div>
+                        <div class="pollutant">
+                            <span>NO2</span>
+                            <strong>45 µg/m³</strong>
+                        </div>
+                        <div class="pollutant">
+                            <span>SO2</span>
+                            <strong>12 µg/m³</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="weather-info">
+                    <h3>Weather Conditions</h3>
+                    <div class="weather-grid">
+                        <div class="weather-item">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span>32°C</span>
+                        </div>
+                        <div class="weather-item">
+                            <i class="fas fa-tint"></i>
+                            <span>56% Humidity</span>
+                        </div>
+                        <div class="weather-item">
+                            <i class="fas fa-wind"></i>
+                            <span>15 km/h NW</span>
+                        </div>
+                        <div class="weather-item">
+                            <i class="fas fa-eye"></i>
+                            <span>2.8 km Visibility</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Map -->
+            <div class="dashboard-content">
+                <div class="map-section">
+                    <h3>Monitoring Stations Map</h3>
+                    <div id="map" style="height: 400px; position: relative;"></div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>AQI Trends (Last 7 Days)</h3>
+                        <canvas id="aqiTrendChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Pollution Sources</h3>
+                        <canvas id="pollutionSourceChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Pollutant Comparison</h3>
+                        <canvas id="pollutantChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Station List -->
+                <div class="stations-list">
+                    <h3>All Monitoring Stations</h3>
+                    <div id="stations-grid" class="stations-grid"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Forecast Section -->
+    <section id="forecast" class="section">
+        <div class="container">
+            <h2 class="section-title">AI-Powered Pollution Forecasting</h2>
+            
+            <div class="forecast-controls">
+                <div class="model-selector">
+                    <h3>Select AI Model</h3>
+                    <div class="model-buttons">
+                        <button class="btn btn--outline active" data-model="arima" onclick="selectModel('arima')">
+                            ARIMA <span class="accuracy">(78.5% accuracy)</span>
+                        </button>
+                        <button class="btn btn--outline" data-model="lstm" onclick="selectModel('lstm')">
+                            LSTM <span class="accuracy">(84.2% accuracy)</span>
+                        </button>
+                        <button class="btn btn--outline" data-model="cnn_lstm" onclick="selectModel('cnn_lstm')">
+                            CNN-LSTM <span class="accuracy">(87.6% accuracy)</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="scenario-controls">
+                    <h3>Scenario Simulation</h3>
+                    <div class="control-group">
+                        <label>Stubble Burning Reduction:</label>
+                        <input type="range" id="stubble-slider" min="0" max="100" value="0" oninput="updateScenario()">
+                        <span id="stubble-value">0%</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Vehicle Restriction:</label>
+                        <input type="range" id="vehicle-slider" min="0" max="50" value="0" oninput="updateScenario()">
+                        <span id="vehicle-value">0%</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Industrial Activity Change:</label>
+                        <input type="range" id="industrial-slider" min="-30" max="30" value="0" oninput="updateScenario()">
+                        <span id="industrial-value">0%</span>
+                    </div>
+                    <button class="btn btn--primary" onclick="runForecast()">Generate Forecast</button>
+                </div>
+            </div>
+
+            <div class="forecast-results">
+                <div class="forecast-chart-container">
+                    <h3>14-Day AQI Forecast</h3>
+                    <canvas id="forecastChart"></canvas>
+                </div>
+                
+                <div class="forecast-summary">
+                    <h3>Forecast Summary</h3>
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-label">Average Predicted AQI</div>
+                            <div class="summary-value" id="avg-forecast">238</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Worst Day</div>
+                            <div class="summary-value" id="worst-day">Day 5</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Improvement</div>
+                            <div class="summary-value" id="improvement">-12 AQI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Policy Section -->
+    <section id="policy" class="section">
+        <div class="container">
+            <h2 class="section-title">Policy Impact Simulation</h2>
+            
+            <div class="policy-simulator">
+                <div class="policy-controls">
+                    <h3>Policy Options</h3>
+                    <div class="policy-list">
+                        <div class="policy-item">
+                            <div class="policy-header">
+                                <input type="checkbox" id="odd-even" onchange="updatePolicyImpact()">
+                                <label for="odd-even">Odd-Even Vehicle Scheme</label>
+                            </div>
+                            <p>Restrict vehicles based on license plate numbers</p>
+                            <div class="policy-impact">Expected Impact: 15-20% AQI reduction</div>
+                        </div>
+                        
+                        <div class="policy-item">
+                            <div class="policy-header">
+                                <input type="checkbox" id="industrial-curfew" onchange="updatePolicyImpact()">
+                                <label for="industrial-curfew">Industrial Curfew</label>
+                            </div>
+                            <p>Restrict industrial operations during high pollution periods</p>
+                            <div class="policy-impact">Expected Impact: 8-12% AQI reduction</div>
+                        </div>
+                        
+                        <div class="policy-item">
+                            <div class="policy-header">
+                                <input type="checkbox" id="construction-ban" onchange="updatePolicyImpact()">
+                                <label for="construction-ban">Construction Ban</label>
+                            </div>
+                            <p>Halt construction activities during severe pollution days</p>
+                            <div class="policy-impact">Expected Impact: 5-8% AQI reduction</div>
+                        </div>
+                        
+                        <div class="policy-item">
+                            <div class="policy-header">
+                                <input type="checkbox" id="stubble-ban" onchange="updatePolicyImpact()">
+                                <label for="stubble-ban">Stubble Burning Ban</label>
+                            </div>
+                            <p>Prevent agricultural stubble burning in neighboring states</p>
+                            <div class="policy-impact">Expected Impact: 25-35% AQI reduction</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="policy-results">
+                    <h3>Projected Impact</h3>
+                    <div class="impact-display">
+                        <div class="current-aqi">
+                            <div class="impact-label">Current AQI</div>
+                            <div class="impact-value current">245</div>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="projected-aqi">
+                            <div class="impact-label">Projected AQI</div>
+                            <div class="impact-value projected" id="projected-aqi">245</div>
+                        </div>
+                    </div>
+                    
+                    <div class="policy-chart-container">
+                        <canvas id="policyChart"></canvas>
+                    </div>
+                    
+                    <div class="policy-recommendations">
+                        <h4>AI Recommendations</h4>
+                        <div id="policy-recommendations">
+                            <p>Select policies above to see AI-generated recommendations based on current pollution levels.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Citizen Portal Section -->
+    <section id="citizen" class="section">
+        <div class="container">
+            <h2 class="section-title">Citizen Interaction Portal</h2>
+            
+            <div class="citizen-content">
+                <!-- Health Advisory -->
+                <div class="health-advisory">
+                    <h3>Today's Health Advisory</h3>
+                    <div class="advisory-card">
+                        <div class="advisory-status poor">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Poor Air Quality</span>
+                        </div>
+                        <div class="advisory-text">
+                            Breathing discomfort to most people on prolonged exposure. 
+                            Avoid outdoor activities, use N95 masks when stepping out.
+                        </div>
+                        <div class="advisory-recommendations">
+                            <h4>Recommendations:</h4>
+                            <ul>
+                                <li>Stay indoors as much as possible</li>
+                                <li>Use air purifiers indoors</li>
+                                <li>Wear N95 masks outdoors</li>
+                                <li>Avoid outdoor exercise</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pollution Reporting -->
+                <div class="pollution-reporting">
+                    <h3>Report Pollution Source</h3>
+                    <form class="report-form" onsubmit="submitReport(event)">
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" id="report-location" placeholder="Enter location or use map pin" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Pollution Type</label>
+                            <select class="form-control" id="report-type" required>
+                                <option value="">Select type</option>
+                                <option value="industrial">Industrial Smoke</option>
+                                <option value="construction">Construction Dust</option>
+                                <option value="vehicular">Vehicle Emissions</option>
+                                <option value="burning">Open Burning</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Severity (1-5)</label>
+                            <div class="severity-buttons">
+                                <button type="button" class="severity-btn" data-severity="1" onclick="selectSeverity(1)">1</button>
+                                <button type="button" class="severity-btn" data-severity="2" onclick="selectSeverity(2)">2</button>
+                                <button type="button" class="severity-btn active" data-severity="3" onclick="selectSeverity(3)">3</button>
+                                <button type="button" class="severity-btn" data-severity="4" onclick="selectSeverity(4)">4</button>
+                                <button type="button" class="severity-btn" data-severity="5" onclick="selectSeverity(5)">5</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="report-description" rows="3" placeholder="Describe the pollution source..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn--primary btn--full-width">Submit Report</button>
+                    </form>
+                </div>
+                
+                <!-- Recent Reports Map -->
+                <div class="citizen-reports">
+                    <h3>Recent Community Reports</h3>
+                    <div id="citizen-map" style="height: 300px; position: relative;"></div>
+                    <div class="reports-list" id="reports-list"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel Section -->
+    <section id="admin" class="section">
+        <div class="container">
+            <div class="admin-login" id="admin-login">
+                <div class="login-form">
+                    <h2>Admin Login</h2>
+                    <form onsubmit="adminLogin(event)">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="admin-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="admin-password" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+                    </form>
+                    <p class="login-hint">Use: admin / password123</p>
+                </div>
+            </div>
+            
+            <div class="admin-panel hidden" id="admin-panel">
+                <div class="admin-header">
+                    <h2>Admin Dashboard</h2>
+                    <button class="btn btn--outline" onclick="adminLogout()">Logout</button>
+                </div>
+                
+                <div class="admin-content">
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Active Stations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Citizen Reports</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">98.5%</div>
+                            <div class="stat-label">System Uptime</div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-sections">
+                        <div class="admin-section">
+                            <h3>Data Management</h3>
+                            <div class="data-controls">
+                                <button class="btn btn--primary">Import CSV Data</button>
+                                <button class="btn btn--outline">Export Reports</button>
+                                <button class="btn btn--outline">Update API Settings</button>
+                            </div>
+                            <div class="data-status">
+                                <div class="status-item">
+                                    <span>Last Data Update:</span>
+                                    <strong>2 minutes ago</strong>
+                                </div>
+                                <div class="status-item">
+                                    <span>Database Status:</span>
+                                    <strong class="status status--success">Healthy</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="admin-section">
+                            <h3>System Monitoring</h3>
+                            <div class="monitoring-grid">
+                                <div class="monitor-item">
+                                    <span>API Response Time</span>
+                                    <strong>245ms</strong>
+                                </div>
+                                <div class="monitor-item">
+                                    <span>Forecast Accuracy</span>
+                                    <strong>87.6%</strong>
+                                </div>
+                                <div class="monitor-item">
+                                    <span>Active Users</span>
+                                    <strong>1,247</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
